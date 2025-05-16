@@ -38,6 +38,14 @@ int16_t sortieDuControleur = 0;
 #define LED_CHANNEL 0
 #define RESOLUTION 16
 
+//PID Etienne
+#define KI 0.5    // Ajuste ce gain selon les performances observées
+#define KD 2.0    // Ajuste ce gain selon les performances observées
+
+float erreurPrecedente = 0;
+float sommeErreur = 0;
+
+
 //*************************************   Explication LEDC   ***************************************
 //
 //Explication fonctionnement ledc:
@@ -153,16 +161,21 @@ void algorithmePID(void){
   }
 
   //TODO: Ajouter code errreur intégrale
+  sommeErreur += erreur;
 
 
 
   //TODO: Ajouter code errreur dérivée
-
+  float deriveeErreur = (erreur - erreurPrecedente) /0.05; //0.05 = 50ms duree boucle
 
 
 
   
-  sortieDuControleur = (KP * erreur);         /* Calcul de la sortie du controleur */
+  // Calcul de la commande PID
+  sortieDuControleur = (KP * erreur) + (KI * sommeErreur) + (KD * deriveeErreur);         /* Calcul de la sortie du controleur */
+
+  // Mise à jour de l'erreur précédente
+  erreurPrecedente = erreur;
 }
 
 
@@ -203,9 +216,10 @@ void afficheDegbug(void){
     //Serial.print("Message de debug\n\r");
 
     // Affiche l'angle mesuré et la commande PWM sous forme de valeurs séparées par une virgule.
-    Serial.print(angleActuelle);
-    Serial.print(",");
-    Serial.println(ctrlMoteur);
+    Serial.printf("%6.2f,%6.2f,%6.2f,%6.2f\r\n", angleConsigne, angleActuelle, sommeErreur, deriveeErreur);
+    //Serial.printf("%6.2f,%6.2f\r\n",angleConsigne, angleActuelle);
+    //Serial.print(",");
+    //Serial.println(ctrlMoteur);
     
     
     bPrintSignal = false;
