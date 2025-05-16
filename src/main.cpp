@@ -39,11 +39,12 @@ int16_t sortieDuControleur = 0;
 #define RESOLUTION 16
 
 //PID Etienne
-#define KI 0.5    // Ajuste ce gain selon les performances observées
+#define KI 0.1    // Ajuste ce gain selon les performances observées
 #define KD 2.0    // Ajuste ce gain selon les performances observées
 
 float erreurPrecedente = 0;
 float sommeErreur = 0;
+float deriveeErreur = 0;
 
 
 //*************************************   Explication LEDC   ***************************************
@@ -161,12 +162,12 @@ void algorithmePID(void){
   }
 
   //TODO: Ajouter code errreur intégrale
-  sommeErreur += erreur;
+  sommeErreur += erreur * 0.05;
 
 
 
   //TODO: Ajouter code errreur dérivée
-  float deriveeErreur = (erreur - erreurPrecedente) /0.05; //0.05 = 50ms duree boucle
+  deriveeErreur = (erreur - erreurPrecedente) /0.05; //0.05 = 50ms duree boucle
 
 
 
